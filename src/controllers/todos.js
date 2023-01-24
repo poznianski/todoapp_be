@@ -1,13 +1,13 @@
 import * as todoService from '../services/todos.js';
 
-export const getAll = (req, res) => {
-  const todos = todoService.getAllTodos();
+export const getAll = async (req, res) => {
+  const todos = await todoService.getAllTodos();
   res.send(todos);
 };
 
-export const getOne = (req, res) => {
+export const getOne = async (req, res) => {
   const { todoId } = req.params;
-  const foundTodo = todoService.getById(todoId);
+  const foundTodo = await todoService.getById(todoId);
 
   if (!foundTodo) {
     res.sendStatus(404);
@@ -17,7 +17,7 @@ export const getOne = (req, res) => {
   res.send(foundTodo);
 };
 
-export const add = (req, res) => {
+export const add = async (req, res) => {
   const { title } = req.body;
 
   if (!title) {
@@ -25,14 +25,14 @@ export const add = (req, res) => {
     return;
   }
 
-  const newTodo = todoService.createTodo(title);
+  const newTodo = await todoService.createTodo(title);
 
   res.statusCode = 201;
 
   res.send(newTodo);
 };
 
-export const remove = (req, res) => {
+export const remove = async (req, res) => {
   const { todoId } = req.params;
   const foundTodo = todoService.getById(todoId);
 
@@ -45,9 +45,9 @@ export const remove = (req, res) => {
   res.sendStatus(204);
 };
 
-export const update = (req, res) => {
+export const update = async (req, res) => {
   const { todoId } = req.params;
-  const foundTodo = todoService.getById(todoId);
+  const foundTodo = await todoService.getById(todoId);
 
   if (!foundTodo) {
     res.sendStatus(404);
@@ -61,9 +61,11 @@ export const update = (req, res) => {
     return;
   }
 
-  todoService.update({ id: todoId, title, completed });
+  await todoService.update({ id: todoId, title, completed });
+  
+  const updatedTodo = todoService.getById(todoId)
 
-  res.send(foundTodo);
+  res.send(updatedTodo);
 };
 
 export const removeMany = (req, res, next) => {
@@ -83,7 +85,7 @@ export const removeMany = (req, res, next) => {
   res.sendStatus(204);
 };
 
-export const updateMany = (req, res, next) => {
+export const updateMany = async (req, res, next) => {
   const { items } = req.body;
 
   if (!Array.isArray(items)) {
@@ -98,7 +100,7 @@ export const updateMany = (req, res, next) => {
     const foundTodo = todoService.getById(id);
 
     if (foundTodo) {
-      todoService.update({ id, title, completed });
+      await todoService.update({ id, title, completed });
       results.push({ id, status: 'Ok' });
     } else {
       errors.push({ id, status: 'Not found' });

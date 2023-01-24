@@ -22,18 +22,3 @@ const hasAction = (action) => {
 
 router.patch('/', hasAction('delete'), todoControllers.removeMany);
 router.patch('/', hasAction('update'), todoControllers.updateMany);
-
-router.patch('/sdfsdf', (req, res) => {
-  const { action } = req.query;
-
-  if (action === 'delete') {
-    todoControllers.removeMany(req, res);
-    return;
-  }
-
-  if (action === 'update') {
-    todoControllers.updateMany(req, res);
-  }
-
-  res.sendStatus(400);
-});

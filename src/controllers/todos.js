@@ -2,7 +2,7 @@ import * as todoService from '../services/todos.js';
 
 export const getAll = async (req, res) => {
   const todos = await todoService.getAllTodos();
-  res.send(todos);
+  res.send(todos.map(todoService.normalize));
 };
 
 export const getOne = async (req, res) => {
@@ -14,7 +14,7 @@ export const getOne = async (req, res) => {
     return;
   }
 
-  res.send(foundTodo);
+  res.send(todoService.normalize(foundTodo));
 };
 
 export const add = async (req, res) => {
@@ -29,7 +29,7 @@ export const add = async (req, res) => {
 
   res.statusCode = 201;
 
-  res.send(newTodo);
+  res.send(todoService.normalize(newTodo));
 };
 
 export const remove = async (req, res) => {
@@ -41,7 +41,24 @@ export const remove = async (req, res) => {
     return;
   }
 
-  todoService.remove(todoId);
+  await todoService.remove(todoId);
+  res.sendStatus(204);
+};
+
+export const removeMany = (req, res) => {
+  const { ids } = req.body;
+
+  if (!Array.isArray(ids)) {
+    res.sendStatus(422);
+    return;
+  }
+
+  try {
+    todoService.removeMany(ids);
+  } catch (e) {
+    res.sendStatus(404);
+  }
+
   res.sendStatus(204);
 };
 
@@ -62,30 +79,13 @@ export const update = async (req, res) => {
   }
 
   await todoService.update({ id: todoId, title, completed });
-  
-  const updatedTodo = todoService.getById(todoId)
+
+  const updatedTodo = todoService.getById(todoId);
 
   res.send(updatedTodo);
 };
 
-export const removeMany = (req, res, next) => {
-  const { ids } = req.body;
-
-  if (!Array.isArray(ids)) {
-    res.sendStatus(422);
-    return;
-  }
-
-  try {
-    todoService.removeMany(ids);
-  } catch (e) {
-    res.sendStatus(404);
-  }
-
-  res.sendStatus(204);
-};
-
-export const updateMany = async (req, res, next) => {
+export const updateMany = (req, res) => {
   const { items } = req.body;
 
   if (!Array.isArray(items)) {
@@ -100,7 +100,7 @@ export const updateMany = async (req, res, next) => {
     const foundTodo = todoService.getById(id);
 
     if (foundTodo) {
-      await todoService.update({ id, title, completed });
+      todoService.update({ id, title, completed });
       results.push({ id, status: 'Ok' });
     } else {
       errors.push({ id, status: 'Not found' });

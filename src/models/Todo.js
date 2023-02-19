@@ -33,6 +33,6 @@ export const Todo = sequelize.define(
     },
   },
   {
-    tableName: 'todos'
+    tableName: 'todos',
   }
 );

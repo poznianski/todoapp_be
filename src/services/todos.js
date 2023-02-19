@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { Todo } from '../models/Todo.js';
 import { sequelize } from '../database.js';
 import { Op } from 'sequelize';

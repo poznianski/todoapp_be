@@ -1,5 +1,5 @@
 import { Todo } from '../models/Todo.js';
-import { sequelize } from '../database.js';
+import { sequelize } from '../db.js';
 import { Op } from 'sequelize';
 
 export async function getAllTodos() {

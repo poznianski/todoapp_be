@@ -1,4 +1,4 @@
-import { sequelize } from '../database.js';
+import { sequelize } from '../db.js';
 import { DataTypes } from 'sequelize';
 
 export const Todo = sequelize.define(
